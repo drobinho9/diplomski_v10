@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard - Fitness App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        body { background-color: #f8f9fa; }
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+        }
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        .alert-custom {
+            border-radius: 15px;
+            border: none;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .ai-highlight {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{{ url_for('main.dashboard') }}">
+            <i class="fas fa-dumbbell text-primary"></i> FitnessApp AI
+        </a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.weekly_report') }}"><i class="fas fa-chart-line"></i> Izvještaji</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.smart_input') }}"><i class="fas fa-robot"></i> AI Trener</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.demographic_insights') }}"><i class="fas fa-users"></i> Uvidi</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> Odjava</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="dashboard-header">
+    <div class="container">
+        <h1>Dobro došli, {{ user.username }}!</h1>
+        <p class="lead mb-0">
+            Vaš cilj:
+            {% if user.goal == 'weight_loss' %}
+                <span class="badge bg-warning">🏃‍♀️ Gubitak težine</span>
+            {% elif user.goal == 'muscle_gain' %}
+                <span class="badge bg-success">💪 Gradnja mišića</span>
+            {% else %}
+                <span class="badge bg-info">⚖️ Održavanje</span>
+            {% endif %}
+            | Razina: <span class="badge bg-light text-dark">{{ user.fitness_level|title }}</span>
+        </p>
+    </div>
+</div>
+
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-custom alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="ai-highlight">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h4><i class="fas fa-robot"></i> Novi AI Trener je ovdje!</h4>
+                <p class="mb-0">Razgovarajte prirodno i AI će automatski prepoznati i spremiti vaše vježbe, hranu i napredak!</p>
+            </div>
+            <div class="col-md-4 text-md-end text-center mt-2 mt-md-0">
+                <a href="{{ url_for('main.smart_input') }}" class="btn btn-light btn-lg">
+                    <i class="fas fa-comments"></i> Počni razgovor
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            {% if fitness_plan %}
+            <div class="feature-card">
+                <h4><i class="fas fa-calendar-alt text-primary"></i> Vaš personalizirani plan treninga</h4>
+                <div class="row">
+                    {% for day, exercises in fitness_plan.items() %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-primary text-white"><strong>{{ day }}</strong></div>
+                            <div class="card-body">
+                                {% if exercises and exercises[0] != "Odmor" %}
+                                    {% for exercise in exercises %}
+                                    <div class="mb-2">
+                                        <a href="{{ exercise.link }}" target="_blank" class="text-decoration-none">
+                                            <i class="fas fa-play-circle text-primary"></i> {{ exercise.name }}
+                                        </a>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted mb-0"><i class="fas fa-bed"></i> Dan odmora</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="feature-card">
+                <h4><i class="fas fa-utensils text-success"></i> AI preporuke hrane</h4>
+                {% if meal_recommendations %}
+                    {% if meal_recommendations[0].name == 'Greška' %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> <strong>Problem s preporukama!</strong><br>
+                            {{ meal_recommendations[0].error or 'Nije moguće učitati preporuke. Provjerite da li su datoteke modela i recepata na ispravnom mjestu.' }}
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            {% for meal in meal_recommendations %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <h6>{{ meal.name }}</h6>
+                                        <p class="text-muted">{{ meal.calories }} kalorija</p>
+                                        <a href="{{ meal.link }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-external-link-alt"></i> Recept
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted">Kliknite gumb "Hrana" kako biste dobili personalizirane preporuke obroka.</p>
+                {% endif %}
+            </div>
+            <div class="feature-card">
+                <h4><i class="fas fa-magic text-info"></i> Generiraj novi sadržaj</h4>
+                <p>Dobijte nove preporuke prilagođene vašem trenutnom stanju:</p>
+                <div class="row">
+                    <div class="col-md-6 mb-2 mb-md-0">
+                        <form method="POST" action="{{ url_for('main.generate_plan') }}">
+                            <button type="submit" class="btn btn-gradient w-100">
+                                <i class="fas fa-dumbbell"></i> Novi plan treninga
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <form method="POST" action="{{ url_for('main.get_meals') }}">
+                            <div class="input-group">
+                                <input type="number" name="calories_so_far" class="form-control" placeholder="Kalorije danas" min="0" />
+                                <button type="submit" class="btn btn-gradient">
+                                    <i class="fas fa-utensils"></i> Hrana
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="feature-card">
+                <h5><i class="fas fa-star text-warning"></i> Glavne funkcionalnosti</h5>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('main.smart_input') }}" class="btn btn-gradient">
+                        <i class="fas fa-robot"></i> AI Trener Chat
+                    </a>
+                    <a href="{{ url_for('main.weekly_report') }}" class="btn btn-outline-success">
+                        <i class="fas fa-chart-line"></i> Tjedni izvještaj
+                    </a>
+                    <a href="{{ url_for('main.demographic_insights') }}" class="btn btn-outline-info">
+                        <i class="fas fa-users"></i> Demografski uvidi
+                    </a>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <h5><i class="fas fa-plus-circle text-success"></i> Brzo bilježenje</h5>
+                <form method="POST" action="{{ url_for('main.log_workout') }}" class="mb-3">
+                    <div class="row g-2">
+                        <div class="col-12"><input type="text" name="exercise" class="form-control form-control-sm" placeholder="Vježba" required /></div>
+                        <div class="col-6"><input type="number" name="sets" class="form-control form-control-sm" placeholder="Setovi" required /></div>
+                        <div class="col-6"><input type="number" name="reps" class="form-control form-control-sm" placeholder="Ponavljanja" required /></div>
+                        <div class="col-6"><input type="number" name="weight" class="form-control form-control-sm" placeholder="Težina (kg)" step="0.1" /></div>
+                        <div class="col-6">
+                            <select name="feeling" class="form-select form-select-sm">
+                                <option value="good">Dobro</option>
+                                <option value="great">Odlično</option>
+                                <option value="tired">Umorno</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary w-100 mt-2"><i class="fas fa-dumbbell"></i> Zabilježi trening</button>
+                </form>
+
+                <form method="POST" action="{{ url_for('main.log_meal') }}" class="mb-3">
+                    <div class="row g-2">
+                        <div class="col-6"><input type="text" name="food" class="form-control form-control-sm" placeholder="Hrana" required /></div>
+                        <div class="col-3"><input type="number" name="quantity" class="form-control form-control-sm" placeholder="Kol." value="1" required /></div>
+                        <div class="col-3"><input type="number" name="calories" class="form-control form-control-sm" placeholder="Kcal" required /></div>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-success w-100 mt-2"><i class="fas fa-utensils"></i> Zabilježi obrok</button>
+                </form>
+            </div>
+
+            <div class="feature-card">
+                <h5><i class="fas fa-history text-secondary"></i> Nedavne aktivnosti</h5>
+                {% if workout_logs %}
+                <div class="mb-3">
+                    <h6>Zadnji treninzi:</h6>
+                    <ul class="list-group list-group-flush">
+                    {% for log in workout_logs %}
+                    <li class="list-group-item">
+                        <strong>{{ log.exercise }}</strong><br />
+                        <small class="text-muted">{{ log.sets }}x{{ log.reps }}{% if log.weight %} ({{ log.weight }}kg){% endif %} - {{ log.date.strftime('%d.%m.') }}</small>
+                    </li>
+                    {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                {% if meal_logs %}
+                <div class="mb-3">
+                    <h6>Zadnji obroci:</h6>
+                    <ul class="list-group list-group-flush">
+                    {% for log in meal_logs %}
+                    <li class="list-group-item">
+                        <strong>{{ log.quantity }}x {{ log.food }}</strong><br />
+                        <small class="text-muted">{{ log.calories }} kcal - {{ log.date.strftime('%d.%m.') }}</small>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="jumbotron">
+        <h1 class="display-4">Dobrodošli u NutriFit AI!</h1>
+        <p class="lead">Vaš osobni AI asistent za prehranu i fitness, spreman učiti s vama.</p>
+        <hr class="my-4">
+        <p>Registrirajte se ili prijavite kako biste započeli svoje putovanje prema boljem zdravlju.</p>
+        {% if not current_user.is_authenticated %}
+        <a class="btn btn-primary btn-lg" href="{{ url_for('main.register') }}" role="button">Registriraj se</a>
+        <a class="btn btn-secondary btn-lg" href="{{ url_for('main.login') }}" role="button">Prijavi se</a>
+        {% else %}
+        <p>Prijavljeni ste kao <strong>{{ current_user.username }}</strong>.</p>
+        <a class="btn btn-success btn-lg" href="{{ url_for('main.dashboard') }}" role="button">Idi na Moj Profil</a>
+        {% endif %}
+    </div>
+{% endblock content %}

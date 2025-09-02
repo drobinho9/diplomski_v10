@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registracija - Fitness App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .registration-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .registration-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .preview-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .tooltip-icon {
+            color: #667eea;
+            margin-left: 5px;
+            cursor: help;
+        }
+        
+        .goal-preview {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-container">
+        <div class="registration-card">
+            <h1 class="header-title">
+                <i class="fas fa-dumbbell"></i> Registracija
+            </h1>
+            
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="alert-container">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <div class="row">
+                    <!-- Osnovni podaci -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user"></i> Korisničko ime
+                            </label>
+                            <input type="text" name="username" id="username" class="form-control" 
+                                   placeholder="Unesite korisničko ime" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope"></i> Email
+                            </label>
+                            <input type="email" name="email" id="email" class="form-control" 
+                                   placeholder="vaš@email.com" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock"></i> Lozinka
+                            </label>
+                            <input type="password" name="password" id="password" class="form-control" 
+                                   placeholder="Sigurna lozinka" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="age" class="form-label">
+                                <i class="fas fa-birthday-cake"></i> Dob
+                            </label>
+                            <input type="number" name="age" id="age" class="form-control" 
+                                   placeholder="Vaša dob" min="16" max="100" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="gender" class="form-label">
+                                <i class="fas fa-venus-mars"></i> Spol
+                            </label>
+                            <select name="gender" id="gender" class="form-control" required>
+                                <option value="">Odaberite spol</option>
+                                <option value="male">Muški</option>
+                                <option value="female">Ženski</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="citizenship" class="form-label">
+                                <i class="fas fa-flag"></i> Državljanstvo
+                            </label>
+                            <input type="text" name="citizenship" id="citizenship" class="form-control" 
+                                   placeholder="HR, US, DE..." value="HR">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="height" class="form-label">
+                                <i class="fas fa-ruler-vertical"></i> Visina (cm)
+                            </label>
+                            <input type="number" name="height" id="height" class="form-control" 
+                                   placeholder="175" min="100" max="250" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="weight" class="form-label">
+                                <i class="fas fa-weight"></i> Težina (kg)
+                            </label>
+                            <input type="number" name="weight" id="weight" class="form-control" 
+                                   placeholder="70" min="30" max="200" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Fitness ciljevi s tooltips-ima -->
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="goal" class="form-label">
+                                <i class="fas fa-bullseye"></i> Cilj treniranja
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top" 
+                                   title="Odaberite primarni cilj - AI će prilagoditi sve preporuke!"></i>
+                            </label>
+                            <select name="goal" id="goal" class="form-control" required>
+                                <option value="">Odaberite cilj</option>
+                                <option value="weight_loss" 
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="right" 
+                                        title="AI će vam preporučiti kardio vježbe i hranu za deficit kalorija. Očekivani gubitak: 0.5-1kg tjedno. Fokus na kalorijski manjak od 300-500 kalorija dnevno.">
+                                    🏃‍♀️ Gubitak težine
+                                </option>
+                                <option value="muscle_gain"
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="right" 
+                                        title="Fokus na vježbe snage i povećan unos proteina (1.8g po kg tjelesne težine). Očekivani rast mišića: 0.25-0.5kg mjesečno. Kalorijski višak od 200-400 kalorija.">
+                                    💪 Gradnja mišića
+                                </option>
+                                <option value="maintenance"
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="right" 
+                                        title="Održavanje trenutne težine uz poboljšanje kondicije. Balansiran unos kalorija i kombinacija snage i kardio treninga.">
+                                    ⚖️ Održavanje težine
+                                </option>
+                            </select>
+                            <!-- Div za prikaz preview-a -->
+                            <div id="goal-preview" class="goal-preview"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="fitness_level" class="form-label">
+                                <i class="fas fa-chart-line"></i> Razina fitnessa
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Budite iskreni - ovo utječe na intenzitet treninga!"></i>
+                            </label>
+                            <select name="fitness_level" id="fitness_level" class="form-control" required>
+                                <option value="">Odaberite razinu</option>
+                                <option value="beginner" 
+                                        data-bs-toggle="tooltip" 
+                                        title="Za one koji rijetko vježbaju ili su tek počeli. AI će preporučiti lakše vježbe s osnovnim pokretima.">
+                                    🌱 Početnik
+                                </option>
+                                <option value="intermediate"
+                                        data-bs-toggle="tooltip" 
+                                        title="Za one koji vježbaju 2-3 puta tjedno. Kombinacija osnovnih i umjereno naprednih vježbi.">
+                                    🏃‍♂️ Srednji
+                                </option>
+                                <option value="advanced"
+                                        data-bs-toggle="tooltip" 
+                                        title="Za iskusne koji vježbaju 4+ puta tjedno. Kompleksne vježbe i viši intenzitet.">
+                                    💪 Napredni
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="equipment" class="form-label">
+                                <i class="fas fa-dumbbell"></i> Dostupna oprema
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Odaberite opremu koju imate - AI će prilagoditi vježbe!"></i>
+                            </label>
+                            <select name="equipment" id="equipment" class="form-control" required>
+                                <option value="">Odaberite opremu</option>
+                                <option value="gym" 
+                                        data-bs-toggle="tooltip" 
+                                        title="Pristup profesionalnoj teretani s potpunom opremom. AI će iskoristiti sve dostupne strojevi i utege.">
+                                    🏋️‍♂️ Teretana
+                                </option>
+                                <option value="home_dumbbells"
+                                        data-bs-toggle="tooltip" 
+                                        title="Kućni trening s bučicama. Vježbe prilagođene ograničenoj opremi ali efikasne za sve grupe mišića.">
+                                    🏠 Kućna oprema (bučice)
+                                </option>
+                                <option value="bodyweight"
+                                        data-bs-toggle="tooltip" 
+                                        title="Trening samo s vlastitom težinom. Pushups, squats, planks i slične vježbe bez opreme.">
+                                    🤸‍♀️ Samo tjelesna težina
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="medical_history" class="form-label">
+                                <i class="fas fa-notes-medical"></i> Medicinska povijest (opcionalno)
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Spomenite ozljede, alergije ili zdravstvene probleme za sigurniju preporuku vježbi."></i>
+                            </label>
+                            <textarea name="medical_history" id="medical_history" class="form-control" 
+                                      placeholder="Npr: ozljeda koljena, alergija na orašaste plodove, dijabetes..." 
+                                      rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-rocket"></i> Kreiraj račun i počni s vježbanjem!
+                    </button>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <p>Već imate račun? <a href="{{ url_for('main.login') }}" class="text-primary">Prijavite se</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Aktivacija tooltips-a
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Preview funkcionalnost za ciljeve
+            const goalSelect = document.getElementById('goal');
+            const previewDiv = document.getElementById('goal-preview');
+            
+            goalSelect.addEventListener('change', function() {
+                const selectedGoal = this.value;
+                showGoalPreview(selectedGoal);
+            });
+            
+            function showGoalPreview(goal) {
+                const previews = {
+                    'weight_loss': `
+                        <div class="preview-card">
+                            <h6><i class="fas fa-running"></i> Vaš plan za gubitak težine:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Kardio:</strong> 4-5x tjedno (30-45 min)</li>
+                                <li><strong>Ishrana:</strong> Deficit od 300-500 kalorija dnevno</li>
+                                <li><strong>Fokus:</strong> Proteini i vlaknaste namirnice</li>
+                                <li><strong>Očekivani rezultat:</strong> 0.5-1kg tjedno</li>
+                            </ul>
+                        </div>
+                    `,
+                    'muscle_gain': `
+                        <div class="preview-card">
+                            <h6><i class="fas fa-dumbbell"></i> Vaš plan za gradnju mišića:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Trening:</strong> Dizanje utega 4-5x tjedno</li>
+                                <li><strong>Proteini:</strong> 1.8g po kg tjelesne težine</li>
+                                <li><strong>Kalorije:</strong> Višak od 200-400 kalorija dnevno</li>
+                                <li><strong>Očekivani rezultat:</strong> 0.25-0.5kg mišića mjesečno</li>
+                            </ul>
+                        </div>
+                    `,
+                    'maintenance': `
+                        <div class="preview-card">
+                            <h6><i class="fas fa-balance-scale"></i> Vaš plan za održavanje:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Trening:</strong> Balansiran trening snage i kardio</li>
+                                <li><strong>Ishrana:</strong> Održavanje trenutnog unosa kalorija</li>
+                                <li><strong>Fokus:</strong> Sveukupno zdravlje i kondicija</li>
+                                <li><strong>Cilj:</strong> Poboljšanje snage i izdržljivosti</li>
+                            </ul>
+                        </div>
+                    `
+                };
+                
+                if (previews[goal]) {
+                    previewDiv.innerHTML = previews[goal];
+                } else {
+                    previewDiv.innerHTML = '';
+                }
+            }
+            
+            // Animacija za forme
+            const inputs = document.querySelectorAll('.form-control');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.transform = 'scale(1.02)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
